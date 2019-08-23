@@ -34,10 +34,13 @@ intArrToDigitsArr :: [Integer] -> [Integer]
 intArrToDigitsArr (x:[]) = toDigits x ++ []
 intArrToDigitsArr (x:xs) = (toDigits x) ++ (intArrToDigitsArr xs)
 
-
+validate :: Integer -> Bool
+validate n
+    | n > 0     = sumDigits (doubleEveryOther (toDigits n)) `mod` 10 == 0
+    | otherwise = False
 
 a, b, c, d, e, f :: Bool
-g :: Bool
+g, h, i :: Bool
 a = toDigits 1234 == [1,2,3,4]
 b = toDigitsRev 1234 == [4,3,2,1]
 c = toDigits 0 == []
@@ -45,6 +48,8 @@ d = toDigits (-17) == []
 e = doubleEveryOther [8,7,6,5] == [16,7,12,5]
 f = doubleEveryOther [1,2,3] == [1,4,3]
 g = sumDigits [16,7,12,5] == 22
+h = validate 4012888888881881 == True
+i = validate 4012888888881882 == False
 
 main :: IO ()
 main = do
@@ -55,3 +60,6 @@ main = do
     putStrLn (show e)
     putStrLn (show f)
     putStrLn (show g)
+    putStrLn (show h)
+    putStrLn (show i)
+
