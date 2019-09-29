@@ -54,12 +54,14 @@ i = validate 4012888888881882 == False
 main :: IO ()
 main = do
     putStrLn (show a)
-    putStrLn (show b)
-    putStrLn (show c)
-    putStrLn (show d)
-    putStrLn (show e)
-    putStrLn (show f)
-    putStrLn (show g)
-    putStrLn (show h)
-    putStrLn (show i)
+    -- putStrLn (show b)
+    -- putStrLn (show c)
+    -- putStrLn (show d)
+    -- putStrLn (show e)
+    -- putStrLn (show f)
+    -- putStrLn (show g)
+    -- putStrLn (show h)
+    -- putStrLn (show i)
+
+
 
