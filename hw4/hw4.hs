@@ -71,6 +71,9 @@ reverse' :: [a] -> [a]
 reverse' xs = foldr rev [] xs
         where rev acc xs = xs ++ [acc]
 
+cartProd :: [a] -> [b] -> [(a, b)]
+cartProd xs ys = [(x, y) | x <- xs, y <- ys]
+
 main :: IO()
 main = do
     putStrLn . show $ zip [1..10] $ map fun2 [1..10]
@@ -90,3 +93,4 @@ main = do
     putStrLn . show $ foldArr (*) 1 [1..4]
     putStrLn . show $ fold'' (+) 0 [1..4]
     putStrLn . show $ reverse' [1..4]
+    putStrLn . show $ cartProd [1..3] ['a', 'b', 'c']
