@@ -23,7 +23,7 @@ class Expr a where
     add :: a -> a -> a
 
 newtype MinMax = MinMax Integer deriving (Show, Eq)
-newtype Mod7 = Mod7 Integer deriving (Show, Eq)    
+newtype Mod7 = Mod7 Integer deriving (Show, Eq)
 
 instance Expr ExprT where
     lit = Lit
