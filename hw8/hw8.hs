@@ -8,9 +8,6 @@ import Employee
 
 -- Exercise 1
 
-
-
-
 glCons :: Employee -> GuestList -> GuestList
 glCons e@Emp { empFun = eFun } (GL list fun) = GL (e:list) (fun + eFun)
 
@@ -42,12 +39,12 @@ treeFold f Node { rootLabel = root, subForest = forest } = f root (map (\tree ->
 
 treeSum' :: Tree Integer -> Integer
 treeSum' tree@(Node root forest) = treeFold (\root forest -> root + sum forest) tree
-    -- where 
-    --       foldFun :: Integer -> [Integer] -> Integer
-    --       foldFun root forest = root + sum forest
-        --   sumForest :: [Tree Integer] -> Integer
-        --   sumForest forest = sum $ map treeSum' forest
 
+treeSize' :: Tree a -> Integer
+treeSize' tree@(Node root forest) = treeFold (\root forest -> 1 + sum forest) tree
+
+treeDepth' :: Tree a -> Integer
+treeDepth' tree@(Node root forest) = treeFold (\root forest -> 1 + maximum (0:forest)) tree
 
 testTree = Node 2 [(Node 4 []), (Node 5 [(Node 6 [])])]
 
@@ -55,13 +52,63 @@ employee = Emp { empName = "Matthew", empFun = 10 }
 empList = GL [Emp "Joe" 5, Emp "John" 15] 20
 empList1 = GL [Emp "Norman" 200, Emp "Polly" 100] 300
 
+nextLevel' :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
+nextLevel' boss results = (withBoss, withoutBoss)
+  where
+      -- with boss, get first list of guestlists, append boss to each, find maximum
+      withBoss = maximumS ( map (\list -> glCons boss list) (map fst results ) )
+      -- without boss, get second list of guestlists, find maximum
+      withoutBoss = maximumS ( map snd results )
+
+-- nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
+-- nextLevel boss results = (withBoss, withoutBoss)
+--   where
+--     withoutBoss = foldMap (uncurry moreFun) results
+--     withBoss = glCons boss $ foldMap snd results
+
+-- | First part of list is with boss.
+nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
+nextLevel boss bestLists = (maximumS withBossL, maximumS withoutBossL)
+  where withoutBossL   = map fst bestLists
+        -- ^ The new withoutBossList has sub bosses in it.
+
+        withoutSubBoss = map snd bestLists
+        withBossL      = map (glCons boss) withoutSubBoss
+        -- ^ The new withBossList doesn't have sub bosses in it.
+
+maximumS :: (Monoid a, Ord a) => [a] -> a
+maximumS [] = mempty
+maximumS lst = maximum lst        
+
+--maxFun :: Tree Employee -> GuestList
+--maxFun tree = uncurry moreFun . nextLevel tree
+
+maxFun :: Tree Employee -> GuestList
+maxFun t = uncurry moreFun $ (treeFold nextLevel t)
+
+-- Convert tree into a list
+test :: Tree Employee -> (GuestList, GuestList)
+test a = treeFold (\node -> nextLevel' node ) a 
+
+boss = Emp "Joe" 5
+guestLists = [(GL [Emp "Stan" 9] 9, GL [Emp "Bob" 3] 3)]
+
 main :: IO()
 --main = putStrLn "Test" >> (readLn >>= \s -> putStrLn s)
 main = do
-    print $ glCons employee empList
-    print $ empList <> empList1
-    print $ empList `moreFun` empList1
-    print $ treeDepth testTree
-    print $ treeSum testTree
-    print $ treeSize testTree
-    print $ treeSum' testTree
+    -- print $ glCons employee empList
+    -- print $ empList <> empList1
+    -- print $ empList `moreFun` empList1
+    -- print $ treeSum testTree
+    -- print $ treeSum' testTree
+    -- print $ treeSize testTree
+    -- print $ treeSize' testTree
+    -- print $ treeDepth testTree
+    -- print $ treeDepth' testTree
+    print . fst $ nextLevel boss guestLists
+    print . snd $ nextLevel boss guestLists
+    print $ (nextLevel employee [(empList, empList)])
+    print $ (nextLevel' employee [(empList, empList)])
+    --print . test $ testCompany 
+    --print $ maximum $ (map snd [(empList, empList1)] )
+    print $ maxFun testCompany2 
