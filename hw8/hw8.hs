@@ -4,6 +4,8 @@ module HW8 where
 
 import Data.Monoid
 import Data.Tree
+import Data.List
+import Data.Function
 import Employee
 
 -- Exercise 1
@@ -52,63 +54,45 @@ employee = Emp { empName = "Matthew", empFun = 10 }
 empList = GL [Emp "Joe" 5, Emp "John" 15] 20
 empList1 = GL [Emp "Norman" 200, Emp "Polly" 100] 300
 
-nextLevel' :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel' boss results = (withBoss, withoutBoss)
-  where
-      -- with boss, get first list of guestlists, append boss to each, find maximum
-      withBoss = maximumS ( map (\list -> glCons boss list) (map fst results ) )
-      -- without boss, get second list of guestlists, find maximum
-      withoutBoss = maximumS ( map snd results )
-
--- nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
--- nextLevel boss results = (withBoss, withoutBoss)
---   where
---     withoutBoss = foldMap (uncurry moreFun) results
---     withBoss = glCons boss $ foldMap snd results
+-- Exercise 3
 
 -- | First part of list is with boss.
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
 nextLevel boss bestLists = (maximumS withBossL, maximumS withoutBossL)
   where withoutBossL   = map fst bestLists
         -- ^ The new withoutBossList has sub bosses in it.
-
         withoutSubBoss = map snd bestLists
         withBossL      = map (glCons boss) withoutSubBoss
         -- ^ The new withBossList doesn't have sub bosses in it.
 
 maximumS :: (Monoid a, Ord a) => [a] -> a
 maximumS [] = mempty
-maximumS lst = maximum lst        
+maximumS lst = maximum lst
 
---maxFun :: Tree Employee -> GuestList
---maxFun tree = uncurry moreFun . nextLevel tree
+-- Exercise 4
 
 maxFun :: Tree Employee -> GuestList
-maxFun t = uncurry moreFun $ (treeFold nextLevel t)
-
--- Convert tree into a list
-test :: Tree Employee -> (GuestList, GuestList)
-test a = treeFold (\node -> nextLevel' node ) a 
+maxFun tree = moreFun (fst results) (snd results)
+    where
+        maxFun' (Node root []) = (glCons root mempty, mempty)
+        maxFun' (Node root forest) = nextLevel root (map maxFun' forest)
+        results = maxFun' tree
 
 boss = Emp "Joe" 5
 guestLists = [(GL [Emp "Stan" 9] 9, GL [Emp "Bob" 3] 3)]
 
+-- Exercise 5
+
+readWriteGL :: IO()
+readWriteGL = readFile "company.txt"
+    >>= (return . fromFileToGuestListString)
+    >>= putStr
+
+fromFileToGuestListString :: String -> String
+fromFileToGuestListString = formatGL . maxFun . read
+
+formatGL :: GuestList -> String
+formatGL (GL list fun) = "Total fun: " ++ show fun ++ "\n" ++ (unlines . sort $ map empName list)
+
 main :: IO()
---main = putStrLn "Test" >> (readLn >>= \s -> putStrLn s)
-main = do
-    -- print $ glCons employee empList
-    -- print $ empList <> empList1
-    -- print $ empList `moreFun` empList1
-    -- print $ treeSum testTree
-    -- print $ treeSum' testTree
-    -- print $ treeSize testTree
-    -- print $ treeSize' testTree
-    -- print $ treeDepth testTree
-    -- print $ treeDepth' testTree
-    print . fst $ nextLevel boss guestLists
-    print . snd $ nextLevel boss guestLists
-    print $ (nextLevel employee [(empList, empList)])
-    print $ (nextLevel' employee [(empList, empList)])
-    --print . test $ testCompany 
-    --print $ maximum $ (map snd [(empList, empList1)] )
-    print $ maxFun testCompany2 
+main = readWriteGL
