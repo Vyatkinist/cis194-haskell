@@ -57,3 +57,10 @@ posInt = Parser f
 ------------------------------------------------------------
 -- Your code goes below here
 ------------------------------------------------------------
+
+first :: (a -> b) -> (a, c) -> (b, c)
+first f (a, c) = (f a, c)
+
+instance Applicative Parser where
+  pure a = Parser f
+    where f str = Just (a, str)
