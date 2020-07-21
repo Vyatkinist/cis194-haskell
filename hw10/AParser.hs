@@ -61,6 +61,11 @@ posInt = Parser f
 first :: (a -> b) -> (a, c) -> (b, c)
 first f (a, c) = (f a, c)
 
+instance Functor Parser where
+  fmap f (Parser pf) = Parser (fmap (first f) . pf)
+
 instance Applicative Parser where
   pure a = Parser f
     where f str = Just (a, str)
+  p1 <*> p2 = Parser f
+    where f str = Just (p1 str, str)
