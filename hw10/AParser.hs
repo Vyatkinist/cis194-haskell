@@ -5,7 +5,6 @@
 module AParser where
 
 import           Control.Applicative
-
 import           Data.Char
 
 -- A parser for a value of type a is a function which takes a String
@@ -61,11 +60,45 @@ posInt = Parser f
 first :: (a -> b) -> (a, c) -> (b, c)
 first f (a, c) = (f a, c)
 
-instance Functor Parser where
-  fmap f (Parser pf) = Parser (fmap (first f) . pf)
+c :: (a -> b) -> Parser a -> String -> Maybe (b, String)
+c f (Parser rp) = (fmap (first f) . rp)
 
-instance Applicative Parser where
-  pure a = Parser f
-    where f str = Just (a, str)
-  p1 <*> p2 = Parser f
-    where f str = Just (p1 str, str)
+instance Functor Parser where
+  fmap f (Parser rp) = Parser (fmap (first f) . rp)
+
+-- a :: (a -> b) -> (String -> Maybe (a, String)) -> Parser b
+-- a f pf = Parser (first f pf)
+
+-- test :: (a -> b) -> (Parser a) -> (Parser b)
+-- test f (Parser pf) = (first pf)
+
+
+-- instance Functor Parser where
+--   fmap f (Parser pf) = 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- instance Functor Parser where
+--   fmap f (Parser pf) = Parser (fmap (first f) . pf)
+
+-- instance Applicative Parser where
+--   pure a = Parser f
+--     where f str = Just (a, str)
+--   p1 <*> p2 = Parser f
+--     where f str = Just (p1 str, str)

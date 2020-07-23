@@ -43,8 +43,11 @@ m_phone1, m_phone2 :: Maybe String
 m_phone1 = Nothing
 m_phone2 = Just "555-1234"
 
+emp1 :: Maybe Employee
 emp1 = Employee <$> m_name1 <*> m_phone1
-emp2 = Employee <$> m_name2 <*> m_phone2
+emp2 :: Maybe (String -> Employee)
+emp2 = Employee <$> m_name2-- <*> m_phone2
+emp3 = Employee "test"
 -- test = Employee "Name"
 
 main :: IO()
