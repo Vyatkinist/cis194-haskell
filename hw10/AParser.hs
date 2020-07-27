@@ -60,21 +60,34 @@ posInt = Parser f
 first :: (a -> b) -> (a, c) -> (b, c)
 first f (a, c) = (f a, c)
 
+a :: Functor f => (a -> b) -> f (a, c) -> f (b, c)
+a f = fmap (first f)
+
+b :: Functor f => (a1 -> b) -> (a2 -> f (a1, c)) -> a2 -> f (b, c)
+b f g = (fmap (first f)) . g
+
 c :: (a -> b) -> Parser a -> String -> Maybe (b, String)
-c f (Parser rp) = (fmap (first f) . rp)
+c f (Parser rp) = ((fmap (first f)) . rp)
+
+d :: (a -> b) -> Maybe a -> Maybe b
+d a (Just b) = fmap a (Just b)
 
 instance Functor Parser where
-  fmap f (Parser rp) = Parser (fmap (first f) . rp)
+  fmap f (Parser pf) = Parser $ ((fmap (first f)) . pf)
 
--- a :: (a -> b) -> (String -> Maybe (a, String)) -> Parser b
--- a f pf = Parser (first f pf)
+e :: Parser a -> String -> Maybe (a, String)
+e = runParser
 
--- test :: (a -> b) -> (Parser a) -> (Parser b)
--- test f (Parser pf) = (first pf)
+-- instance Applicative Parser where
+--   pure p = Parser $ \str -> Just (p, str)
+--   p1 <*> p2 = Parser $ \str -> 
+--     case runParser p1 str of
+--       Just (o1, rest) -> Just (o1, rest)
+--       Nothing -> Nothing
 
 
--- instance Functor Parser where
---   fmap f (Parser pf) = 
+newtype Test = TestConstructor { testFunc :: String -> Int }
+
 
 
 
