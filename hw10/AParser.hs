@@ -72,11 +72,12 @@ c f (Parser rp) = ((fmap (first f)) . rp)
 d :: (a -> b) -> Maybe a -> Maybe b
 d a (Just b) = fmap a (Just b)
 
-instance Functor Parser where
-  fmap f (Parser pf) = Parser $ ((fmap (first f)) . pf)
+-- instance Functor Parser where
+--   fmap f (Parser pf) = Parser $ ((fmap (first f)) . pf)
 
 e :: Parser a -> String -> Maybe (a, String)
 e = runParser
+
 
 -- instance Applicative Parser where
 --   pure p = Parser $ \str -> Just (p, str)
@@ -88,6 +89,20 @@ e = runParser
 
 newtype Test = TestConstructor { testFunc :: String -> Int }
 
+
+
+
+
+instance Functor Parser where
+  fmap f (Parser pf) = Parser $ \str -> (fmap (first f)) . pf $ str
+
+
+instance Applicative Parser where
+  pure x = Parser $ \str -> Just (x, str)
+  p1 <*> p2 = Parser $ \str ->
+    case runParser p1 str of
+      Just (o1, rest1) -> runParser p2 rest1
+      Nothing -> Nothing
 
 
 
